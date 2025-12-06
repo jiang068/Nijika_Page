@@ -1,23 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kessoku Band | 結束バンド</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Rock+Salt&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --primary: #ec4899;
+        --secondary: #eab308;
+      }
       body {
         font-family: 'Noto Sans JP', sans-serif;
         background-color: #0f0f11;
         color: #fff;
         overflow-x: hidden;
+        cursor: none; /* Hide default cursor for custom one */
       }
       .font-rock {
         font-family: 'Rock Salt', cursive;
       }
+      
+      /* Noise Texture Overlay */
+      .noise-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9998;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+      }
+
+      /* Custom Cursor */
+      #cursor {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--primary);
+        border-radius: 50%;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background-color 0.2s ease;
+        z-index: 9999;
+        mix-blend-mode: difference;
+      }
+      #cursor.hovered {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(236, 72, 153, 0.2);
+        border-color: transparent;
+      }
+
       /* Custom Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
@@ -32,6 +72,8 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #be123c;
       }
+      
+      /* Glitch Effect */
       .glitch-effect {
         position: relative;
       }
@@ -43,7 +85,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: #0f0f11;
+        background: #00000000;
       }
       .glitch-effect::before {
         left: 2px;
@@ -67,19 +109,500 @@
         5% { clip: rect(48px, 9999px, 26px, 0); }
         100% { clip: rect(52px, 9999px, 14px, 0); }
       }
+
+      /* Loader */
+      #loader {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.8s ease-out, visibility 0.8s;
+      }
+      .loader-text {
+        font-family: 'Rock Salt', cursive;
+        color: #ec4899;
+        font-size: 2rem;
+        animation: pulse 1s infinite;
+      }
+
+      /* Hero Hover Effects */
+      .hero-strip {
+        transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease;
+      }
+      .hero-strip:hover {
+        flex: 2;
+        filter: grayscale(0%);
+      }
+      .hero-content {
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+      }
+      .hero-strip:hover .hero-content {
+        opacity: 1;
+        transform: translateY(0);
+      }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1"
-  }
-}
-</script>
 </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<body class="selection:bg-pink-500 selection:text-white">
+
+    <!-- Noise Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- Custom Cursor -->
+    <div id="cursor" class="hidden md:block"></div>
+
+    <!-- Loader -->
+    <div id="loader">
+      <div class="text-center">
+        <div class="loader-text mb-4">KESSOKU BAND</div>
+        <div class="w-48 h-1 bg-gray-800 rounded-full overflow-hidden relative">
+          <div class="absolute inset-0 bg-pink-500 w-full animate-[shimmer_2s_infinite]"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300 bg-transparent">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+          <div class="flex items-center gap-2 cursor-pointer hover-trigger" onclick="scrollToSection('hero')">
+            <i data-lucide="music-2" class="h-8 w-8 text-pink-500 animate-pulse"></i>
+            <span class="font-rock text-2xl font-bold tracking-widest text-white">
+              KESSOKU<span class="text-pink-500">BAND</span>
+            </span>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-12">
+              <button onclick="scrollToSection('hero')" class="nav-link hover-trigger relative group px-2 py-2 text-sm font-bold text-gray-300 hover:text-white transition-colors tracking-widest">
+                HOME
+                <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-pink-500 transition-all duration-300 group-hover:w-full"></span>
+              </button>
+              <button onclick="scrollToSection('characters')" class="nav-link hover-trigger relative group px-2 py-2 text-sm font-bold text-gray-300 hover:text-white transition-colors tracking-widest">
+                MEMBERS
+                <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-pink-500 transition-all duration-300 group-hover:w-full"></span>
+              </button>
+              <button onclick="scrollToSection('gallery')" class="nav-link hover-trigger relative group px-2 py-2 text-sm font-bold text-gray-300 hover:text-white transition-colors tracking-widest">
+                GALLERY
+                <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-pink-500 transition-all duration-300 group-hover:w-full"></span>
+              </button>
+              <button onclick="scrollToSection('history')" class="nav-link hover-trigger relative group px-2 py-2 text-sm font-bold text-gray-300 hover:text-white transition-colors tracking-widest">
+                HISTORY
+                <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-pink-500 transition-all duration-300 group-hover:w-full"></span>
+              </button>
+            </div>
+          </div>
+          <!-- Mobile Menu Button -->
+          <div class="md:hidden">
+            <button onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white">
+                <i data-lucide="menu" class="h-8 w-8"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="hidden md:hidden bg-black/95 absolute w-full border-b border-gray-800 backdrop-blur-xl">
+          <div class="px-4 pt-4 pb-6 space-y-2">
+              <button onclick="scrollToSection('hero'); toggleMobileMenu()" class="block text-gray-300 hover:text-white hover:bg-zinc-800 px-3 py-3 rounded w-full text-left font-bold">HOME</button>
+              <button onclick="scrollToSection('characters'); toggleMobileMenu()" class="block text-gray-300 hover:text-white hover:bg-zinc-800 px-3 py-3 rounded w-full text-left font-bold">MEMBERS</button>
+              <button onclick="scrollToSection('gallery'); toggleMobileMenu()" class="block text-gray-300 hover:text-white hover:bg-zinc-800 px-3 py-3 rounded w-full text-left font-bold">GALLERY</button>
+              <button onclick="scrollToSection('history'); toggleMobileMenu()" class="block text-gray-300 hover:text-white hover:bg-zinc-800 px-3 py-3 rounded w-full text-left font-bold">HISTORY</button>
+          </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div id="hero" class="relative h-screen w-full overflow-hidden bg-black flex flex-col justify-center items-center">
+        <!-- Strips Container -->
+        <div id="hero-strips" class="absolute inset-0 z-10 flex flex-row">
+            <!-- JS will render strips here -->
+        </div>
+
+        <!-- Main Title Overlay -->
+        <div class="absolute z-20 pointer-events-none flex flex-col items-center justify-center mix-blend-overlay">
+            <h1 class="text-7xl md:text-[10rem] font-black text-white tracking-tighter text-center uppercase glitch-effect leading-none select-none" data-text="KESSOKU BAND">
+            KESSOKU BAND
+            </h1>
+            <p class="text-2xl md:text-4xl font-bold text-white mt-4 tracking-[0.8em] text-center select-none">
+            結束バンド
+            </p>
+        </div>
+
+        <div class="absolute bottom-8 z-30 animate-bounce pointer-events-auto cursor-pointer hover-trigger" onclick="scrollToSection('characters')">
+            <i data-lucide="arrow-down" class="w-10 h-10 text-white opacity-80 hover:text-pink-500 transition-colors"></i>
+        </div>
+    </div>
+
+    <!-- Character Showcase -->
+    <section id="characters" class="relative py-24 bg-zinc-900 min-h-screen flex items-center overflow-hidden">
+        <!-- Background Decor -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+            <div id="bg-char-name" class="text-[25vw] font-black text-zinc-800/40 whitespace-nowrap -rotate-12 transform translate-y-20 transition-all duration-700 ease-out blur-sm">
+                HITORI
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 w-full relative z-10">
+            <h2 class="text-5xl md:text-7xl font-black text-white mb-16 flex items-center gap-4 select-none">
+            <span class="text-pink-500">01</span> MEMBER
+            </h2>
+
+            <div class="flex flex-col lg:flex-row gap-8 lg:gap-16">
+                <!-- Nav -->
+                <div id="char-nav" class="w-full lg:w-1/3 flex flex-col gap-3">
+                    <!-- JS renders buttons -->
+                </div>
+
+                <!-- Display -->
+                <div class="w-full lg:w-2/3 perspective-1000">
+                    <div id="char-card" class="relative bg-zinc-800/90 backdrop-blur-sm rounded-none border-l-4 border-pink-500 min-h-[600px] opacity-0 transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                         <!-- JS renders content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-24 bg-black relative border-t border-zinc-800">
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(30,30,30,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(30,30,30,0.5)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none opacity-20"></div>
+
+        <div class="max-w-7xl mx-auto px-4 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16">
+                <div>
+                    <h2 class="text-5xl md:text-7xl font-black text-white relative z-10 select-none">
+                        <span class="text-pink-500">02</span> GALLERY
+                    </h2>
+                    <p class="mt-2 text-xl text-gray-500 font-mono tracking-widest">MEMORIES & MOMENTS</p>
+                </div>
+                <div class="hidden md:block h-px w-1/3 bg-zinc-700 mb-4"></div>
+            </div>
+
+            <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[250px]">
+                <!-- JS renders gallery -->
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section id="history" class="py-32 bg-zinc-950 text-white relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-4 relative z-10">
+            <h2 class="text-5xl md:text-7xl font-black mb-20 text-center select-none">
+                <span class="text-pink-500">03</span> HISTORY
+            </h2>
+            <div class="relative">
+                <div class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 w-0.5 h-full bg-gradient-to-b from-transparent via-pink-500 to-transparent"></div>
+                <div id="timeline-container" class="space-y-16">
+                    <!-- JS renders timeline -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-16 border-t border-zinc-800 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-8 md:mb-0 text-center md:text-left">
+                <h2 class="text-3xl font-black tracking-tighter mb-2 font-rock">KESSOKU BAND</h2>
+                <p class="text-zinc-500 text-sm">© Aki Hamaji / Houbunsha, Aniplex</p>
+                <p class="text-zinc-600 text-xs mt-1">Design Concept by AI</p>
+            </div>
+            <div class="flex gap-8">
+                <a href="#" class="hover-trigger text-zinc-400 hover:text-white transition-colors transform hover:-translate-y-1 duration-300"><i data-lucide="twitter" class="w-6 h-6"></i></a>
+                <a href="#" class="hover-trigger text-zinc-400 hover:text-white transition-colors transform hover:-translate-y-1 duration-300"><i data-lucide="instagram" class="w-6 h-6"></i></a>
+                <a href="#" class="hover-trigger text-zinc-400 hover:text-white transition-colors transform hover:-translate-y-1 duration-300"><i data-lucide="youtube" class="w-6 h-6"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        // --- DATA ---
+        const CHARACTERS = [
+            {
+                id: 'bocchi',
+                name: 'Hitori Gotoh',
+                kanji: '後藤 ひとり',
+                role: 'Lead Guitar / Lyrics',
+                instrument: 'Gibson Les Paul Custom',
+                description: 'A severely socially anxious girl who picked up the guitar to make friends. Known online as "guitarhero". Often transforms into abstract shapes when stressed.',
+                color: 'pink',
+                themeColorHex: '#ec4899', // pink-500
+                imageUrl: 'https://picsum.photos/seed/bocchi-hero/800/1200',
+            },
+            {
+                id: 'nijika',
+                name: 'Nijika Ijichi',
+                kanji: '伊地知 虹夏',
+                role: 'Drums / Leader',
+                instrument: 'Tama Imperialstar',
+                description: 'The energetic leader of Kessoku Band. She dreams of playing at the Budokan. The Dorito on her head is her charm point.',
+                color: 'yellow',
+                themeColorHex: '#eab308', // yellow-500
+                imageUrl: 'https://picsum.photos/seed/nijika-hero/800/1200',
+            },
+            {
+                id: 'ryo',
+                name: 'Ryo Yamada',
+                kanji: '山田 リョウ',
+                role: 'Bass / Composer',
+                instrument: 'Fender Precision Bass',
+                description: 'The cool, mysterious bassist who is perpetually broke due to buying expensive gear. Eats weeds when money is tight.',
+                color: 'blue',
+                themeColorHex: '#2563eb', // blue-600
+                imageUrl: 'https://picsum.photos/seed/ryo-hero/800/1200',
+            },
+            {
+                id: 'kita',
+                name: 'Ikuyo Kita',
+                kanji: '喜多 郁代',
+                role: 'Vocals / Rhythm Guitar',
+                instrument: 'Gibson Les Paul Junior',
+                description: 'A cheerful, social butterfly who joined the band to be close to Ryo. The "Kita-aura" is blinding. Actually named Ikuyo.',
+                color: 'red',
+                themeColorHex: '#ef4444', // red-500
+                imageUrl: 'https://picsum.photos/seed/kita-hero/800/1200',
+            },
+        ];
+
+        const GALLERY_ITEMS = [
+            { id: '1', title: 'Live at STARRY', imageUrl: 'https://picsum.photos/seed/live1/800/600', size: 'large' },
+            { id: '2', title: 'Practice', imageUrl: 'https://picsum.photos/seed/practice/400/400', size: 'small' },
+            { id: '3', title: 'Sunset', imageUrl: 'https://picsum.photos/seed/sunset/400/600', size: 'medium' },
+            { id: '4', title: 'New Gear', imageUrl: 'https://picsum.photos/seed/gear/400/400', size: 'small' },
+            { id: '5', title: 'Street Perf.', imageUrl: 'https://picsum.photos/seed/street/400/400', size: 'small' },
+            { id: '6', title: 'Backstage', imageUrl: 'https://picsum.photos/seed/backstage/800/400', size: 'medium' },
+            { id: '7', title: 'Jump!', imageUrl: 'https://picsum.photos/seed/jump/400/600', size: 'medium' },
+            { id: '8', title: 'Smile', imageUrl: 'https://picsum.photos/seed/smile/400/400', size: 'small' },
+        ];
+
+        const TIMELINE_EVENTS = [
+            { id: '1', date: '2022.04', title: 'Band Formation', description: 'Nijika discovers a lonely Hitori in the park and recruits her.', icon: 'sparkles' },
+            { id: '2', date: '2022.05', title: 'First Audition', description: 'The band struggles but barely passes the audition at STARRY.', icon: 'music' },
+            { id: '3', date: '2022.08', title: 'First Live', description: 'Despite the rain, they perform their first live concert with a small audience.', icon: 'zap' },
+            { id: '4', date: '2022.11', title: 'School Festival', description: 'Kessoku Band performs at the Shuka High culture festival. Bocchi breaks a string but keeps going.', icon: 'star' },
+        ];
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderHero() {
+            const container = document.getElementById('hero-strips');
+            container.innerHTML = CHARACTERS.map(char => `
+                <div class="hero-strip relative flex-1 h-full group overflow-hidden border-r border-gray-900/50 last:border-none cursor-pointer grayscale hover:grayscale-0" onclick="scrollToSection('characters'); switchCharacterById('${char.id}')">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" style="background-image: url('${char.imageUrl}')">
+                         <div class="absolute inset-0 opacity-50 mix-blend-multiply group-hover:opacity-0 transition-opacity duration-500" style="background-color: ${char.themeColorHex}"></div>
+                    </div>
+                    <div class="hero-content absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 translate-y-8 group-hover:translate-y-0 group-hover:opacity-100">
+                        <h2 class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-t from-white to-gray-500 tracking-tighter writing-mode-vertical-rl md:writing-mode-horizontal-tb origin-bottom">
+                            ${char.name.split(' ')[0]}
+                        </h2>
+                        <p class="text-sm md:text-lg font-bold text-white mt-2 uppercase tracking-widest border-t-2 border-pink-500 pt-4 inline-block">
+                            ${char.instrument}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        let activeCharIndex = 0;
+
+        function renderCharacterNav() {
+            const nav = document.getElementById('char-nav');
+            nav.innerHTML = CHARACTERS.map((char, index) => `
+                <button
+                    onclick="switchCharacter(${index})"
+                    class="hover-trigger group relative overflow-hidden p-5 text-left transition-all duration-300 border-l-4 w-full ${index === activeCharIndex ? 'bg-zinc-800 border-pink-500 translate-x-2 shadow-lg' : 'bg-transparent border-zinc-800 hover:bg-zinc-800/50 hover:border-zinc-600'}"
+                >
+                    <div class="flex items-center justify-between relative z-10">
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-black italic uppercase ${index === activeCharIndex ? 'text-white' : 'text-gray-500 group-hover:text-white transition-colors'}">
+                                ${char.name}
+                            </h3>
+                            <p class="text-xs text-gray-500 font-mono tracking-widest mt-1">${char.role}</p>
+                        </div>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function renderCharacterCard() {
+            const char = CHARACTERS[activeCharIndex];
+            const card = document.getElementById('char-card');
+            const bgText = document.getElementById('bg-char-name');
+            
+            // Background parallax text update
+            bgText.textContent = char.name.toUpperCase();
+            bgText.style.color = char.themeColorHex + '15'; // Very transparent hex
+            
+            // Fade out
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.innerHTML = `
+                    <div class="flex flex-col md:flex-row h-full">
+                        <div class="md:w-5/12 relative h-64 md:h-auto overflow-hidden group">
+                            <img src="${char.imageUrl}" alt="${char.name}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent md:bg-gradient-to-r opacity-90"></div>
+                            <div class="absolute bottom-4 left-4 p-2 bg-black/80 backdrop-blur text-white text-xs font-mono border border-white/20">
+                                MODEL: ${char.id.toUpperCase()}_V2
+                            </div>
+                        </div>
+                        <div class="md:w-7/12 p-8 md:p-12 flex flex-col justify-center space-y-8 relative">
+                             <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                                <i data-lucide="music" class="w-32 h-32"></i>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-5xl md:text-7xl font-black text-white leading-none tracking-tight mb-2 italic" style="text-shadow: 2px 2px 0px ${char.themeColorHex}">${char.kanji}</h3>
+                                <p class="text-2xl text-pink-500 font-rock">${char.name}</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <p class="text-xs text-zinc-500 uppercase tracking-widest font-bold mb-1">Position</p>
+                                    <p class="text-lg font-bold text-white">${char.role}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-zinc-500 uppercase tracking-widest font-bold mb-1">Gear</p>
+                                    <p class="text-lg font-bold text-white">${char.instrument}</p>
+                                </div>
+                            </div>
+                            <div class="pt-6 border-t border-zinc-700/50">
+                                <p class="text-gray-300 leading-loose text-sm md:text-base font-light">
+                                    ${char.description}
+                                </p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="hover-trigger px-6 py-2 bg-white text-black font-black uppercase tracking-wider hover:bg-pink-500 hover:text-white transition-colors skew-x-[-10deg]">
+                                    <div class="skew-x-[10deg]">Profile</div>
+                                </button>
+                                <button class="hover-trigger px-6 py-2 border border-white text-white font-black uppercase tracking-wider hover:bg-white hover:text-black transition-colors skew-x-[-10deg]">
+                                    <div class="skew-x-[10deg]">Gallery</div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+                // Fade in
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 300);
+        }
+
+        function switchCharacter(index) {
+            if (activeCharIndex === index) return;
+            activeCharIndex = index;
+            renderCharacterNav();
+            renderCharacterCard();
+        }
+        
+        function switchCharacterById(id) {
+            const index = CHARACTERS.findIndex(c => c.id === id);
+            if(index !== -1) switchCharacter(index);
+        }
+
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = GALLERY_ITEMS.map((item, index) => `
+                <div class="hover-trigger relative group overflow-hidden bg-zinc-900 cursor-pointer 
+                    ${item.size === 'large' ? 'col-span-2 row-span-2' : ''}
+                    ${item.size === 'medium' ? 'col-span-1 row-span-2' : ''}
+                    ${item.size === 'small' ? 'col-span-1 row-span-1' : ''}"
+                    style="animation-delay: ${index * 50}ms">
+                    
+                    <img src="${item.imageUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" />
+                    
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 border-4 border-transparent group-hover:border-pink-500/50 box-border">
+                        <span class="text-xs text-pink-500 font-mono mb-1">IMG_0${index + 1}</span>
+                        <h3 class="text-white font-black text-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 uppercase italic">
+                            ${item.title}
+                        </h3>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = TIMELINE_EVENTS.map((event, index) => `
+                <div class="flex flex-col md:flex-row items-center justify-between w-full group relative">
+                    <div class="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-black border-4 border-zinc-700 group-hover:border-pink-500 group-hover:scale-150 transition-all z-10"></div>
+                    
+                    <div class="w-full md:w-5/12 ${index % 2 === 0 ? 'md:text-right md:pr-12' : 'md:order-2 md:text-left md:pl-12'} mb-8 md:mb-0">
+                        <div class="inline-block p-2 bg-zinc-900 border border-zinc-800 text-pink-500 font-mono font-bold text-sm mb-2">
+                            ${event.date}
+                        </div>
+                        <h3 class="text-3xl font-black text-white mb-3 group-hover:text-pink-500 transition-colors uppercase italic">${event.title}</h3>
+                        <p class="text-zinc-400 leading-relaxed">${event.description}</p>
+                    </div>
+                    
+                    <div class="w-full md:w-5/12 ${index % 2 === 0 ? 'md:order-2' : ''}"></div>
+                </div>
+            `).join('');
+        }
+
+        // --- UTILS ---
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Custom Cursor Logic
+        const cursor = document.getElementById('cursor');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest('.hover-trigger') || e.target.closest('button') || e.target.tagName === 'A') {
+                cursor.classList.add('hovered');
+            } else {
+                cursor.classList.remove('hovered');
+            }
+        });
+
+        // --- INIT ---
+        window.addEventListener('load', () => {
+            // Hide Loader
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.visibility = 'hidden';
+                }, 800);
+            }, 1500);
+
+            renderHero();
+            renderCharacterNav();
+            renderCharacterCard(); 
+            renderGallery();
+            renderHistory();
+            lucide.createIcons();
+            
+            // Initial Animation Trigger for Card
+            document.getElementById('char-card').style.opacity = '1';
+        });
+        
+        window.addEventListener('scroll', () => {
+             const navbar = document.getElementById('navbar');
+             if (window.scrollY > 50) {
+                 navbar.classList.add('bg-black/90', 'backdrop-blur-md', 'border-b', 'border-gray-800');
+                 navbar.classList.remove('bg-transparent');
+             } else {
+                 navbar.classList.remove('bg-black/90', 'backdrop-blur-md', 'border-b', 'border-gray-800');
+                 navbar.classList.add('bg-transparent');
+             }
+         });
+
+    </script>
+</body>
 </html>
