@@ -9,7 +9,8 @@ const CHARACTERS = [
         description: 'A severely socially anxious girl who picked up the guitar to make friends. Known online as "guitarhero". Often transforms into abstract shapes when stressed.',
         color: 'pink',
         themeColorHex: '#ec4899', // pink-500
-        imageUrl: 'https://picsum.photos/seed/bocchi-hero/800/1200',
+        imageUrl: 'assets/pics/bocchi.png',
+        cardImageUrl: 'assets/pics/bocchi-2.jpg',
     },
     {
         id: 'nijika',
@@ -20,7 +21,8 @@ const CHARACTERS = [
         description: 'The energetic leader of Kessoku Band. She dreams of playing at the Budokan. The Dorito on her head is her charm point.',
         color: 'yellow',
         themeColorHex: '#eab308', // yellow-500
-        imageUrl: 'https://picsum.photos/seed/nijika-hero/800/1200',
+        imageUrl: 'assets/pics/nijika.png',
+        cardImageUrl: 'assets/pics/nijika-2.jpg',
     },
     {
         id: 'ryo',
@@ -31,7 +33,8 @@ const CHARACTERS = [
         description: 'The cool, mysterious bassist who is perpetually broke due to buying expensive gear. Eats weeds when money is tight.',
         color: 'blue',
         themeColorHex: '#2563eb', // blue-600
-        imageUrl: 'https://picsum.photos/seed/ryo-hero/800/1200',
+        imageUrl: 'assets/pics/ryo.png',
+        cardImageUrl: 'assets/pics/ryo-2.jpg',
     },
     {
         id: 'kita',
@@ -42,19 +45,20 @@ const CHARACTERS = [
         description: 'A cheerful, social butterfly who joined the band to be close to Ryo. The "Kita-aura" is blinding. Actually named Ikuyo.',
         color: 'red',
         themeColorHex: '#ef4444', // red-500
-        imageUrl: 'https://picsum.photos/seed/kita-hero/800/1200',
+        imageUrl: 'assets/pics/kita.png',
+        cardImageUrl: 'assets/pics/kita-2.jpg',
     },
 ];
 
 const GALLERY_ITEMS = [
-    { id: '1', title: 'Live at STARRY', imageUrl: 'https://picsum.photos/seed/live1/800/600', size: 'large' },
-    { id: '2', title: 'Practice', imageUrl: 'https://picsum.photos/seed/practice/400/400', size: 'small' },
-    { id: '3', title: 'Sunset', imageUrl: 'https://picsum.photos/seed/sunset/400/600', size: 'medium' },
-    { id: '4', title: 'New Gear', imageUrl: 'https://picsum.photos/seed/gear/400/400', size: 'small' },
-    { id: '5', title: 'Street Perf.', imageUrl: 'https://picsum.photos/seed/street/400/400', size: 'small' },
-    { id: '6', title: 'Backstage', imageUrl: 'https://picsum.photos/seed/backstage/800/400', size: 'medium' },
-    { id: '7', title: 'Jump!', imageUrl: 'https://picsum.photos/seed/jump/400/600', size: 'medium' },
-    { id: '8', title: 'Smile', imageUrl: 'https://picsum.photos/seed/smile/400/400', size: 'small' },
+    { id: '1', title: 'Kita', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/r1HvUDOY.jpg', size: 'large' },
+    { id: '2', title: 'Nijika', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/yOY8J0Rn.jpg', size: 'small' },
+    { id: '3', title: 'Selfish', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/MGDaMFlo.jpg', size: 'medium' },
+    { id: '4', title: 'New Gear', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/ZqEwVDOL.jpg', size: 'small' },
+    { id: '5', title: 'Practice', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/Bwp9gEXt.jpg', size: 'small' },
+    { id: '6', title: 'Jump!', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/ipZqcTf0.jpg', size: 'medium' },
+    { id: '7', title: 'Daily', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/fKHFW7fe.jpg', size: 'medium' },
+    { id: '8', title: 'Ryo', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/qpw2zJPO.jpg', size: 'small' },
 ];
 
 const TIMELINE_EVENTS = [
@@ -123,11 +127,8 @@ function renderCharacterCard() {
         card.innerHTML = `
             <div class="flex flex-col md:flex-row h-full">
                 <div class="md:w-5/12 relative h-64 md:h-auto overflow-hidden group">
-                    <img src="${char.imageUrl}" alt="${char.name}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <img src="${char.cardImageUrl}" alt="${char.name}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                     <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent md:bg-gradient-to-r opacity-90"></div>
-                    <div class="absolute bottom-4 left-4 p-2 bg-black/80 backdrop-blur text-white text-xs font-mono border border-white/20">
-                        MODEL: ${char.id.toUpperCase()}_V2
-                    </div>
                 </div>
                 <div class="md:w-7/12 p-8 md:p-12 flex flex-col justify-center space-y-8 relative">
                      <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
