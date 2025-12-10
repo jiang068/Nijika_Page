@@ -51,14 +51,14 @@ const CHARACTERS = [
 ];
 
 const GALLERY_ITEMS = [
-    { id: '1', title: 'Kita', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/r1HvUDOY.jpg', size: 'large' },
-    { id: '2', title: 'Nijika', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/yOY8J0Rn.jpg', size: 'small' },
-    { id: '3', title: 'Selfish', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/MGDaMFlo.jpg', size: 'medium' },
-    { id: '4', title: 'New Gear', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/ZqEwVDOL.jpg', size: 'small' },
-    { id: '5', title: 'Practice', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/Bwp9gEXt.jpg', size: 'small' },
-    { id: '6', title: 'Jump!', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/ipZqcTf0.jpg', size: 'medium' },
-    { id: '7', title: 'Daily', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/fKHFW7fe.jpg', size: 'medium' },
-    { id: '8', title: 'Ryo', imageUrl: 'https://imgbed.fufu.blog/file/kessoku/qpw2zJPO.jpg', size: 'small' },
+    { id: '1', title: 'Kita', imageUrl: 'https://imgbed.fufu.blog/file/site_pics/kessoku/vTaR4Xwu.jpg', size: 'large' },
+    { id: '2', title: 'Nijika', imageUrl: 'https://imgbed.fufu.blog/file/site_pics/kessoku/KSPqPO4q.jpg', size: 'small' },
+    { id: '3', title: 'Selfish', imageUrl: 'https://imgbed.fufu.blog/file/site_pics/kessoku/B3MnSx4C.jpg', size: 'medium' },
+    { id: '4', title: 'New Gear', imageUrl: 'https://imgbed.fufu.blog/file/site_pics/kessoku/qLtrczNV.jpg', size: 'small' },
+    { id: '5', title: 'Practice', imageUrl: 'https://imgbed.fufu.blog/file/site_pics/kessoku/kiek8Urk.jpg', size: 'small' },
+    { id: '6', title: 'Jump!', imageUrl: 'https://imgbed.fufu.blog/file/site_pics/kessoku/uFlFu9Nc.jpg', size: 'medium' },
+    { id: '7', title: 'Daily', imageUrl: 'https://imgbed.fufu.blog/file/site_pics/kessoku/rTM8HA2d.jpg', size: 'medium' },
+    { id: '8', title: 'Ryo', imageUrl: 'https://imgbed.fufu.blog/file/site_pics/kessoku/mpRyhykA.jpg', size: 'small' },
 ];
 
 const TIMELINE_EVENTS = [
